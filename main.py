@@ -16,17 +16,45 @@ load_dotenv()
 if not firebase_admin._apps:
     try:
         service_account_file = None
-        # Check for environment variable first (for deployment)
-        firebase_creds_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
-        if firebase_creds_json:
+        # Method 1: Check for individual environment variables (preferred for deployment)
+        firebase_type = os.getenv("FIREBASE_TYPE")
+        firebase_project_id = os.getenv("FIREBASE_PROJECT_ID")
+        firebase_private_key = os.getenv("FIREBASE_PRIVATE_KEY")
+        firebase_client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+        
+        if firebase_type and firebase_project_id and firebase_private_key and firebase_client_email:
             import json
             import tempfile
-            # Create temporary file from environment variable
+            # Build credentials from individual environment variables
+            creds_dict = {
+                "type": firebase_type,
+                "project_id": firebase_project_id,
+                "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID", ""),
+                "private_key": firebase_private_key.replace('\\n', '\n'),
+                "client_email": firebase_client_email,
+                "client_id": os.getenv("FIREBASE_CLIENT_ID", ""),
+                "auth_uri": os.getenv("FIREBASE_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
+                "token_uri": os.getenv("FIREBASE_TOKEN_URI", "https://oauth2.googleapis.com/token"),
+                "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs"),
+                "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL", ""),
+                "universe_domain": os.getenv("FIREBASE_UNIVERSE_DOMAIN", "googleapis.com")
+            }
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                json.dump(creds_dict, f)
+                service_account_file = f.name
+            print("Using Firebase credentials from individual environment variables")
+        
+        # Method 2: Check for JSON string in environment variable
+        elif os.getenv("FIREBASE_CREDENTIALS_JSON"):
+            import json
+            import tempfile
+            firebase_creds_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
             with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
                 json.dump(json.loads(firebase_creds_json), f)
                 service_account_file = f.name
-            print("Using Firebase credentials from environment variable")
-        # Check for service account file
+            print("Using Firebase credentials from FIREBASE_CREDENTIALS_JSON environment variable")
+        
+        # Method 3: Check for service account file
         elif os.path.exists("serviceAccountKey.json"):
             service_account_file = "serviceAccountKey.json"
         else:
@@ -47,11 +75,12 @@ if not firebase_admin._apps:
                 firebase_admin.initialize_app(cred)
                 print("Firebase initialized with Application Default Credentials")
             except Exception:
-                print("Warning: Firebase credentials not found. Please add serviceAccountKey.json or dreproxy-*.json to the root directory.")
+                print("Warning: Firebase credentials not found.")
+                print("Please set environment variables or add serviceAccountKey.json to the root directory.")
                 print("The app will start but Firebase operations will fail until credentials are added.")
     except Exception as e:
         print(f"Error initializing Firebase: {e}")
-        print("Please ensure serviceAccountKey.json or dreproxy-*.json is in the root directory.")
+        print("Please ensure Firebase credentials are properly configured.")
 
 try:
     # Use default database - if you created a named database, change "(default)" to your database ID
