@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Management System</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Agent Management</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="form">
+                    <span class="nav-icon">📝</span>
+                    <span>Agent Form</span>
+                </a>
+                <a href="#" class="nav-item" data-page="list">
+                    <span class="nav-icon">📋</span>
+                    <span>Agent List</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Agent Form Page -->
+            <div id="form-page" class="page active">
+                <div class="page-header">
+                    <h1>Agent Information Form</h1>
+                </div>
+                <div class="form-container">
+                    <form id="agent-form" class="agent-form">
+                        <div class="form-group">
+                            <label for="name">Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone_number">Phone Number *</label>
+                            <input type="tel" id="phone_number" name="phone_number" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="licence_number">Licence Number *</label>
+                            <input type="text" id="licence_number" name="licence_number" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
+                        </div>
+
+                        <div id="form-message" class="message"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Agent List Page -->
+            <div id="list-page" class="page">
+                <div class="page-header">
+                    <h1>Agent List</h1>
+                    <button class="btn btn-primary" id="refresh-btn">Refresh</button>
+                </div>
+                <div class="list-container">
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="search-input" 
+                            placeholder="Search by name, email, phone number, or licence number..."
+                        >
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div id="agents-list" class="agents-list">
+                        <p class="loading">Loading agents...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
+
